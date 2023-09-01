@@ -1,0 +1,99 @@
+{{/*
+Copyright 2023. Hancom Inc. All rights reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter-conf
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.filterConf.accessModes }}
+    - {{ . | quote }}
+  {{- end }}        
+  resources:
+    requests:
+      storage: {{ .Values.persistence.filterConf.size | quote }}
+  {{- if .Values.persistence.filterConf.storageClass -}}
+  {{ print "" | indent 2 }}
+  storageClassName: {{ .Values.persistence.filterConf.storageClass | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter-docs-template
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.filterDocsTemplate.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.filterDocsTemplate.size | quote }}
+  {{- if .Values.persistence.filterDocsTemplate.storageClass -}}
+  {{ print "" | indent 2 }}
+  storageClassName: {{ .Values.persistence.filterDocsTemplate.storageClass | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter-docs-upload
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.filterDocsUpload.accessModes }}
+    - {{ . | quote }}
+  {{- end }}        
+  resources:
+    requests:
+      storage: {{ .Values.persistence.filterDocsUpload.size | quote }}
+  {{- if .Values.persistence.filterDocsUpload.storageClass -}}
+  {{ print "" | indent 2 }}
+  storageClassName: {{ .Values.persistence.filterDocsUpload.storageClass | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter-resources
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.filterResources.accessModes }}
+    - {{ . | quote }}
+  {{- end }}        
+  resources:
+    requests:
+      storage: {{ .Values.persistence.filterResources.size | quote }}
+  {{- if .Values.persistence.filterResources.storageClass -}}
+  {{ print "" | indent 2 }}
+  storageClassName: {{ .Values.persistence.filterResources.storageClass | quote }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter-shared
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  {{- range .Values.persistence.filterShared.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.filterShared.size | quote }}
+  {{- if .Values.persistence.filterShared.storageClass -}}
+  {{ print "" | indent 2 }}
+  storageClassName: {{ .Values.persistence.filterShared.storageClass | quote }}
+  {{- end }}

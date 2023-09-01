@@ -1,0 +1,160 @@
+{{/*
+Copyright 2023. Hancom Inc. All rights reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.documentviewerFilter.autoscaling.enabled }}
+  replicas: {{ .Values.documentviewerFilter.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: documentviewer-filter
+    {{- include "documentviewer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.documentviewerFilter.podAnnotations }}            
+      annotations:
+        {{- toYaml . | nindent 8 }}              
+      {{- end }}
+      labels:
+        app: documentviewer-filter
+      {{- include "documentviewer.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.documentviewerFilter.documentviewerFilter.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.documentviewerFilter.podSecurityContext | nindent 8 }}
+      containers:
+      - command:
+        - sh
+        - -c
+        - /root/startup.sh
+        env:
+        - name: HDV_REDIS_HOST
+          {{- if .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisHost -}}
+          {{ print "" }}
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisHost }}
+          {{- else -}}
+          {{ print "" }}
+          value: {{ include "documentviewer.fullname" . }}-redis-master
+          {{- end }}
+        - name: HDV_REDIS_PORT
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisPort }}
+        - name: HDV_REDIS_DB
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisDb }}
+        - name: HDV_REDIS_RETRY_COUNT
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisRetryCount }}
+        - name: HDV_REDIS_RETRY_INTERVAL
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisRetryInterval }}
+        - name: HDV_REDIS_PASSWORD
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisPassword }}
+        - name: HDV_REDIS_USERNAME
+          value: {{ quote .Values.documentviewerFilter.documentviewerFilter.env.hdvRedisUsername }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.documentviewerFilter.documentviewerFilter.image.repository }}:{{ .Values.documentviewerFilter.documentviewerFilter.image.tag
+          | default .Chart.AppVersion }}
+        securityContext:
+          {{- toYaml .Values.documentviewerFilter.documentviewerFilter.securityContext | nindent 12 }}
+        imagePullPolicy: {{ .Values.documentviewerFilter.documentviewerFilter.imagePullPolicy }}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - /root/health-check.sh
+          failureThreshold: 6
+        name: documentviewer-filter
+        ports:
+        - containerPort: 8101
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - /root/health-check.sh
+          failureThreshold: 6
+        resources: {{- toYaml .Values.documentviewerFilter.documentviewerFilter.resources | nindent 10 }}
+        startupProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - /root/health-check.sh
+          initialDelaySeconds: 30
+        volumeMounts:
+        {{- with .Values.documentviewerFilter.licenseConfigMap }}
+        - mountPath: /root/documentviewer/conf/LicenseFile.dat
+          name: license-file
+          subPath: LicenseFile.dat
+        {{- end }}
+        - mountPath: /root/documentviewer/conf
+          name: documentviewer-filter-conf
+        - mountPath: /root/documentviewer/documents/__upload
+          name: documentviewer-filter-docs-upload
+        - mountPath: /root/documentviewer/documents/__template
+          name: documentviewer-filter-docs-template
+        - mountPath: /root/documentviewer/filterserver/Shared
+          name: documentviewer-filter-shared
+        - mountPath: /root/documentviewer/resource
+          name: documentviewer-filter-resources
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until test -f /mnt/pv/.provider_done; do sleep 2; done
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        securityContext:
+          {{- toYaml .Values.documentviewerFilter.waitDataProvider.securityContext | nindent 12 }}
+        imagePullPolicy: {{ .Values.documentviewerFilter.waitDataProvider.imagePullPolicy }}
+        image: {{ .Values.documentviewerFilter.waitDataProvider.image.repository }}:{{ .Values.documentviewerFilter.waitDataProvider.image.tag | default .Chart.AppVersion }}
+        name: wait-data-provider
+        resources: {{- toYaml .Values.documentviewerFilter.waitDataProvider.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /mnt/pv
+          name: documentviewer-filter-shared
+      volumes:
+      {{- with .Values.documentviewerFilter.licenseConfigMap }}
+      - configMap:
+          name: {{ $.Values.documentviewerFilter.licenseConfigMap }}
+        name: license-file
+      {{- end }}
+      - name: documentviewer-filter-conf
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-conf
+      - name: documentviewer-filter-docs-upload
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-docs-upload    
+      - name: documentviewer-filter-docs-template
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-docs-template
+      - name: documentviewer-filter-shared
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-shared
+      - name: documentviewer-filter-resources
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-resources
+      {{- with .Values.documentviewerFilter.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.documentviewerFilter.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.documentviewerFilter.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,235 @@
+# Copyright 2023. Hancom Inc. All rights reserved.
+# SPDX-License-Identifier: APACHE-2.0
+
+# kubernetesClusterDomain Kubernetes cluster domain name
+kubernetesClusterDomain: cluster.local
+
+# Enabling this will publically expose your instance
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts: 
+  - host: documentviewer.example.com
+    paths: 
+    - path: /
+      pathType: Prefix
+  tls: []
+  #  - secretName: documentviewer-example-tls
+  #    hosts:
+  #      - documentviewer.example.com
+
+# Override a job object to provide static data files
+dataProvider:
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  dataProvider:
+    # environment variables
+    env:
+      sharedMountDirPath: /mnt/shared
+      templateMountDirPath: /mnt/template
+
+    image:
+      repository: hancomitsm/documentviewer-data-provider
+      tag: "1.0"
+
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+
+    imagePullSecrets: []
+
+    # Specify a imagePullPolicy - 'Always' or 'IfNotPresent'
+    # ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    imagePullPolicy: IfNotPresent
+
+    # resource requests and limits
+    # ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    resources:
+      # Examples:
+      # limits:
+      #   cpu: 500m
+      #   memory: 500Mi
+      limits: {}
+      # Examples:
+      # requests:
+      #   cpu: 500m
+      #   memory: 500Mi
+      requests: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+  
+# Override a deployment object to convert your documents
+documentviewerFilter:
+
+  # replicas to deploy
+  replicas: 3
+
+  # Name of existing ConfigMap containing license data
+  # The key value must be "LicenseFile.dat"
+  licenseConfigMap: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  documentviewerFilter:
+    # environment variables 
+    env:
+      hdvRedisDb: "0"
+      # Need to set same value as 'redis.auth.password'
+      hdvRedisPassword: "redispass"
+      hdvRedisPort: "6379"
+      hdvRedisRetryCount: "20"
+      hdvRedisRetryInterval: "3"
+    image:
+      repository: hancomitsm/documentviewer
+      tag: "v8017"
+
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+
+    imagePullSecrets: []
+
+    # Specify a imagePullPolicy - 'Always' or 'IfNotPresent'
+    # ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    imagePullPolicy: IfNotPresent
+    
+    # resource requests and limits
+    # ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    resources:
+      # Examples:
+      # limits:
+      #   cpu: 2
+      #   memory: 4Gi
+      limits: {}
+      # Examples:
+      # requests:
+      #   cpu: 2
+      #   memory: 4Gi
+      requests: {}
+    
+  waitDataProvider:
+    image:
+      repository: busybox
+      tag: 1.36
+
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+
+    imagePullSecrets: []
+
+    # Specify a imagePullPolicy - 'Always' or 'IfNotPresent'
+    # ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    imagePullPolicy: IfNotPresent
+      
+    # resource requests and limits
+    # ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    resources:
+      # Examples:
+      # limits:
+      #   cpu: 50m
+      #   memory: 100Mi
+      limits: {}
+      # Examples:
+      # requests:
+      #   cpu: 50m
+      #   memory: 100Mi
+      requests: {}
+      
+  service:
+    port: 8101
+    type: ClusterIP
+
+  autoscaling:
+    enabled: false
+    #minReplicas: 1
+    #maxReplicas: 10
+    #targetCPUUtilizationPercentage: 80
+    #targetMemoryUtilizationPercentage: 80
+    
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+    
+persistence:
+  filterConf:
+    # Persistent Volume Storage Class          
+    # storageClass: ""
+    size: 300Mi
+    # PVC Access Modes 
+    accessModes:
+      - ReadWriteMany
+  filterDocsTemplate:
+    # Persistent Volume Storage Class          
+    # storageClass: ""
+    size: 300Mi
+    # PVC Access Modes 
+    accessModes:
+      - ReadWriteMany
+  filterDocsUpload:
+    # Persistent Volume Storage Class          
+    # storageClass: ""
+    size: 1Gi
+    # PVC Access Modes 
+    accessModes:
+      - ReadWriteMany
+  filterResources:
+    # Persistent Volume Storage Class          
+    # storageClass: ""
+    size: 1Gi
+    # PVC Access Modes 
+    accessModes:
+      - ReadWriteMany
+  filterShared:
+    # Persistent Volume Storage Class          
+    # storageClass: ""
+    size: 2Gi
+    # PVC Access Modes 
+    accessModes:
+      - ReadWriteMany
+
+redis:
+  enabled: true
+  architecture: replication
+  auth:
+    enabled: true
+    # Need to set with your own password
+    password: "redispass"
+  master:
+    persistence:
+      # Persistent Volume Storage Class
+      # storageClass: ""
+      size: 1Gi
+  replica:
+    persistence:
+      # Persistent Volume Storage Class
+      # storageClass: ""
+      size: 1Gi
