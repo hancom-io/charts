@@ -147,4 +147,4 @@ helm delete my-release
 
 ## License
 
-Licensed under the [Apache License, Version 2.0](LICENSE.txt)
+Licensed under the [Apache License, Version 2.0](../LICENSE.txt)
