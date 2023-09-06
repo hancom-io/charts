@@ -1,0 +1,53 @@
+{{/*
+Copyright 2023. Hancom Inc. All rights reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+{{- if .Values.documentviewerFilter.autoscaling.enabled -}}
+{{- if semverCompare ">=1.22-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: autoscaling/v2
+{{- else -}}
+apiVersion: autoscaling/v2beta1
+{{- end }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-filter
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "documentviewer.fullname" . }}-filter
+  minReplicas: {{ .Values.documentviewerFilter.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.documentviewerFilter.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.documentviewerFilter.autoscaling.targetCPUUtilizationPercentage -}}
+    {{ print "" }}
+    - type: Resource
+      resource:
+        name: cpu
+        {{- if semverCompare ">=1.22-0" .Capabilities.KubeVersion.GitVersion -}}
+        {{ print "\n        target:" }}
+          averageUtilization: {{ .Values.documentviewerFilter.autoscaling.targetCPUUtilizationPercentage }}
+          type: Utilization
+        {{- else -}}
+        {{ print "" }}
+        targetAverageUtilization: {{ .Values.documentviewerFilter.autoscaling.targetCPUUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.documentviewerFilter.autoscaling.targetMemoryUtilizationPercentage -}}
+    {{ print "" }}
+    - type: Resource
+      resource:
+        name: memory
+        {{- if semverCompare ">=1.22-0" .Capabilities.KubeVersion.GitVersion -}}
+        {{ print "\n        target:" }}
+          averageUtilization: {{ .Values.documentviewerFilter.autoscaling.targetMemoryUtilizationPercentage }}
+          type: Utilization
+        {{- else -}}
+        {{ print "" }}
+        targetAverageUtilization: {{ .Values.documentviewerFilter.autoscaling.targetMemoryUtilizationPercentage }}
+        {{- end }}
+    {{- end }}
+{{- end }}

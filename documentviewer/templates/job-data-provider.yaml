@@ -1,0 +1,70 @@
+{{/*
+Copyright 2023. Hancom Inc. All rights reserved.
+SPDX-License-Identifier: APACHE-2.0
+*/}}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "documentviewer.fullname" . }}-data-provider
+  labels:
+  {{- include "documentviewer.labels" . | nindent 4 }}
+spec:
+  template:
+    metadata:
+      {{- with .Values.dataProvider.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        sidecar.istio.io/inject: "false"
+    spec:
+      {{- with .Values.dataProvider.dataProvider.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.dataProvider.podSecurityContext | nindent 8 }}
+      containers:
+      - env:
+        - name: SHARED_MOUNT_DIR_PATH
+          value: {{ quote .Values.dataProvider.dataProvider.env.sharedMountDirPath
+            }}
+        - name: TEMPLATE_MOUNT_DIR_PATH
+          value: {{ quote .Values.dataProvider.dataProvider.env.templateMountDirPath
+            }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.dataProvider.dataProvider.image.repository }}:{{ .Values.dataProvider.dataProvider.image.tag
+          | default .Chart.AppVersion }}
+        securityContext:
+          {{- toYaml .Values.dataProvider.dataProvider.securityContext | nindent 12 }}
+        imagePullPolicy: {{ .Values.dataProvider.dataProvider.imagePullPolicy }}
+        name: data-provider
+        resources: {{- toYaml .Values.dataProvider.dataProvider.resources | nindent
+          10 }}
+        volumeMounts:
+        - mountPath: /mnt/shared
+          name: shared-data
+        - mountPath: /mnt/template
+          name: template-data
+      restartPolicy: Never
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-shared
+      - name: template-data
+        persistentVolumeClaim:
+          claimName: {{ include "documentviewer.fullname" . }}-filter-docs-template
+      {{- with .Values.dataProvider.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dataProvider.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dataProvider.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
