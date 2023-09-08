@@ -1,10 +1,10 @@
-# DocumentViewer
+# Hancom Document Viewer
 
 ## Introduction
 
-This chart bootstraps a DocumentViewer deployment on a Kubernetes cluster using the Helm package manager.
+This chart bootstraps a Hancom Document Viewer deployment on a Kubernetes cluster using the Helm package manager.
 
-It also packages the [Bitnami Redis chart](https://github.com/bitnami/charts/tree/main/bitnami/redis) which is required for bootstrapping a Redis deployment for the database requirements of the DocumentViewer applications.
+It also packages the [Bitnami Redis chart](https://github.com/bitnami/charts/tree/main/bitnami/redis) which is required for bootstrapping a Redis deployment for the database requirements of the Hancom Document Viewer applications.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ kubectl create configmap license --from-file=LicenseFile.dat
 ```console
 helm repo add hancomio https://hancom-io.github.io/charts-release
 helm repo update
-helm install my-release hancomio/documentviewer --set documentviewerFilter.licenseConfigMap=license
+helm install my-release hancomio/hancom-document-viewer --set documentviewerFilter.licenseConfigMap=license
 ```
 
 ## Uninstalling the Chart
@@ -147,4 +147,4 @@ helm delete my-release
 
 ## License
 
-Licensed under the [Apache License, Version 2.0](../LICENSE.txt)
+Licensed under the [Apache License, Version 2.0](LICENSE.txt)
