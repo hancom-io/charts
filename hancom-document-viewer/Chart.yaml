@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: APACHE-2.0
 
 apiVersion: v2
-name: documentviewer
-description: DocumentViewer Kubernetes solution
+name: hancom-document-viewer
+description: Hancom Document Viewer solution for Kubernetes
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives

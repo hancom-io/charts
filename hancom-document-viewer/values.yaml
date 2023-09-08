@@ -36,8 +36,8 @@ dataProvider:
       templateMountDirPath: /mnt/template
 
     image:
-      repository: hancomitsm/documentviewer-data-provider
-      tag: "1.0"
+      repository: hancomitsm/hancom-document-viewer-data-provider
+      tag: "1.0.0"
 
     securityContext: {}
       # capabilities:
@@ -79,9 +79,9 @@ documentviewerFilter:
   # replicas to deploy
   replicas: 3
 
-  # Name of existing ConfigMap containing license data
+  # Name of existing Secret containing license data
   # The key value must be "LicenseFile.dat"
-  licenseConfigMap: ""
+  licenseSecret: ""
 
   podAnnotations: {}
 
@@ -98,8 +98,8 @@ documentviewerFilter:
       hdvRedisRetryCount: "20"
       hdvRedisRetryInterval: "3"
     image:
-      repository: hancomitsm/documentviewer
-      tag: "v8017"
+      repository: hancomitsm/hancom-document-viewer
+      tag: "8.0.17"
 
     securityContext: {}
       # capabilities:
