@@ -79,9 +79,9 @@ documentviewerFilter:
   # replicas to deploy
   replicas: 3
 
-  # Name of existing ConfigMap containing license data
+  # Name of existing Secret containing license data
   # The key value must be "LicenseFile.dat"
-  licenseConfigMap: ""
+  licenseSecret: ""
 
   podAnnotations: {}
 

@@ -93,10 +93,11 @@ spec:
             - /root/health-check.sh
           initialDelaySeconds: 30
         volumeMounts:
-        {{- with .Values.documentviewerFilter.licenseConfigMap }}
+        {{- with .Values.documentviewerFilter.licenseSecret }}
         - mountPath: /root/documentviewer/conf/LicenseFile.dat
           name: license-file
           subPath: LicenseFile.dat
+          readOnly: true
         {{- end }}
         - mountPath: /root/documentviewer/conf
           name: documentviewer-filter-conf
@@ -126,9 +127,9 @@ spec:
         - mountPath: /mnt/pv
           name: documentviewer-filter-shared
       volumes:
-      {{- with .Values.documentviewerFilter.licenseConfigMap }}
-      - configMap:
-          name: {{ $.Values.documentviewerFilter.licenseConfigMap }}
+      {{- with .Values.documentviewerFilter.licenseSecret }}
+      - secret:
+          secretName: {{ $.Values.documentviewerFilter.licenseSecret }}
         name: license-file
       {{- end }}
       - name: documentviewer-filter-conf

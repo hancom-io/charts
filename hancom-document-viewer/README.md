@@ -15,17 +15,17 @@ It also packages the [Bitnami Redis chart](https://github.com/bitnami/charts/tre
 
 ## Installing the Chart
 
-1. If you have a license file, you need to create a ConfigMap using the file
+1. If you have a license file, you need to create a Secret using the file
 
 ```console
-kubectl create configmap license --from-file=LicenseFile.dat
+kubectl create secret generic license --from-file=LicenseFile.dat
 ```
 2. To install the chart with the release name `my-release`:
 
 ```console
 helm repo add hancomio https://hancom-io.github.io/charts-release
 helm repo update
-helm install my-release hancomio/hancom-document-viewer --set documentviewerFilter.licenseConfigMap=license
+helm install my-release hancomio/hancom-document-viewer --set documentviewerFilter.licenseSecret=license
 ```
 
 ## Uninstalling the Chart
@@ -82,7 +82,7 @@ helm delete my-release
 | Name                                                                  | Description                                                                                | Value              |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------ |
 | `documentviewerFilter.replicas`                                       | Number of the DocumentViewer replicas to deploy	                                     | `3`                |
-| `documentviewerFilter.licenseConfigMap`                               | Name of existing ConfigMap containing license data. The key value must be "LicenseFile.dat"| `""`               |
+| `documentviewerFilter.licenseSecret`                                  | Name of existing Secret containing license data. The key value must be "LicenseFile.dat"   | `""`               |
 | `documentviewerFilter.podAnnotations`                                 | Annotations for the DocumentViewer pods	                                             | `{}`               |
 | `documentviewerFilter.podSecurityContext`                             | The DocumentViewer pods' Security Context                                                  | `{}`               |
 | `documentviewerFilter.documentviewerFilter.env`                       | The DocumentViewer container environment variables                                         | See below          |
