@@ -98,7 +98,8 @@ documentviewerFilter:
       hdvRedisRetryCount: "20"
       hdvRedisRetryInterval: "3"
     image:
-      repository: hancomitsm/hancom-document-viewer
+      repository: orca-harbor.cloud.hancom.com/documentviewer/hancom-document-viewer
+      # repository: hancomitsm/hancom-document-viewer
       tag: "8.0.17"
 
     securityContext: {}
