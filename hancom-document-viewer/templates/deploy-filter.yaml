@@ -66,17 +66,11 @@ spec:
         securityContext:
           {{- toYaml .Values.documentviewerFilter.documentviewerFilter.securityContext | nindent 12 }}
         imagePullPolicy: {{ .Values.documentviewerFilter.documentviewerFilter.imagePullPolicy }}
-        livenessProbe:
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - /root/health-check.sh
-          failureThreshold: 6
         name: documentviewer-filter
         ports:
         - containerPort: 8101
           protocol: TCP
+        resources: {{- toYaml .Values.documentviewerFilter.documentviewerFilter.resources | nindent 10 }}
         readinessProbe:
           exec:
             command:
@@ -84,14 +78,20 @@ spec:
             - -c
             - /root/health-check.sh
           failureThreshold: 6
-        resources: {{- toYaml .Values.documentviewerFilter.documentviewerFilter.resources | nindent 10 }}
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         startupProbe:
           exec:
             command:
             - /bin/sh
             - -c
             - /root/health-check.sh
+          failureThreshold: 50
           initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         volumeMounts:
         {{- with .Values.documentviewerFilter.licenseSecret }}
         - mountPath: /root/documentviewer/conf/LicenseFile.dat
