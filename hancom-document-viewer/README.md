@@ -1,4 +1,4 @@
-# Hancom Document Viewer
+# Hancom Document Viewer Helm Charts template repository for Kubernetes
 
 ## Introduction
 
@@ -147,4 +147,4 @@ helm delete my-release
 
 ## License
 
-Licensed under the [Apache License, Version 2.0](LICENSE.txt)
+This helm chart is available under the [Apache License, Version 2.0](LICENSE.txt)
