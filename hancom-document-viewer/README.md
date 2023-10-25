@@ -4,18 +4,18 @@
 
 This chart bootstraps a Hancom Document Viewer deployment on a Kubernetes cluster using the Helm package manager.
 
-It also packages the [Bitnami Redis chart](https://github.com/bitnami/charts/tree/main/bitnami/redis) which is required for bootstrapping a Redis deployment for the database requirements of the Hancom Document Viewer applications.
+It also packages the [Bitnami Redis chart](https://github.com/bitnami/charts/tree/main/bitnami/redis) which is required to bootstrap a Redis deployment for the database requirements of the Hancom Document Viewer applications.
 
 ## Prerequisites
 
 - Kubernetes 1.16+
 - Helm 3.2.0+
 - PV provisioner support in the underlying infrastructure
-- ReadWriteMany volumes for deployment scaling
+- ReadWriteMany volumes for scaling deployment
 
 ## Installing the Chart
 
-1. If you have a license file, you need to create a Secret using the file
+1. If you have a license file, you need to create a Secret using the file.
 
 ```console
 kubectl create secret generic license --from-file=LicenseFile.dat
@@ -38,26 +38,26 @@ helm delete my-release
 
 ## Parameters
 
-### Common parameters
+### Common Parameters
 | Name                     | Description                                                           | Value           |
 | ------------------------ | --------------------------------------------------------------------- | --------------- |
 | `clusterDomain`          | Kubernetes Cluster Domain                                             | `cluster.local` |
 
-### Ingress parameters
+### Ingress Parameters
 
 | Name                                 | Description                                               |  Value                      |
 | ------------------------------------ | --------------------------------------------------------- | --------------------------- |
 |`ingress.enabled`                     | If true, an Ingress is created	                           | `false`                     |
 |`ingress.className`                   | The name of the Ingress Class associated with the ingress | `""`                        |
 |`ingress.annotations`                 | Ingress annotations	                                   | `{}`                        |
-|`ingress.hosts`                       | Hostnames to be covered with this ingress record          | See below                   |
+|`ingress.hosts`                       | Hostnames to be covered with the ingress record           | See below                   |
 |`ingress.hosts[0].host`               | Host for the Ingress rule                                 | `documentviewer.example.com`|
 |`ingress.hosts[0].paths`              | Paths for the Ingress rule                                | See below                   |
 |`ingress.hosts[0].paths[0].path`      | Path for the Ingress rule	                           | `/`                         |
 |`ingress.hosts[0].paths[0].pathType`  | Path Type for the Ingress rule	                           | `Prefix`                    |
 |`ingress.tls`                         | TLS configuration	                                   | []                          |
 
-### DataProvider Job parameters
+### DataProvider Job Parameters
 
 | Name                                                                  | Description                                                                                | Value              |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------ |
@@ -71,13 +71,13 @@ helm delete my-release
 | `dataProvider.dataProvider.securityContext`                           | The DataProvider containers' Security Context                                              | `{}`               |
 | `dataProvider.dataProvider.imagePullSecrets`                          | The DataProvider image pull secrets                                                        | `[]`               |
 | `dataProvider.dataProvider.imagePullPolicy`                           | The DataProvider image pull policy                                                         | `IfNotPresent`     |
-| `dataProvider.dataProvider.resources.limits`                          | Pod resource limits                                                                        | `{}`               |
-| `dataProvider.dataProvider.resources.requests`                        | Pod resource requests                                                                      | `{}`               |
+| `dataProvider.dataProvider.resources.limits`                          | Pod resources limit                                                                        | `{}`               |
+| `dataProvider.dataProvider.resources.requests`                        | Pod resources request                                                                      | `{}`               |
 | `dataProvider.nodeSelector`                                           | Node labels for pod assignment	                                                     | `{}`               |
 | `dataProvider.tolerations`                                            | Tolerations for pod assignment	                                                     | `[]`               |
 | `dataprovider.affinity`                                               | Affinity for pod assignment	                                                             | `{}`               |
 
-### DocumentViewer Deployment parameters
+### DocumentViewer Deployment Parameters
 
 | Name                                                                  | Description                                                                                | Value              |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------ |
@@ -87,7 +87,7 @@ helm delete my-release
 | `documentviewerFilter.podSecurityContext`                             | The DocumentViewer pods' Security Context                                                  | `{}`               |
 | `documentviewerFilter.documentviewerFilter.env`                       | The DocumentViewer container environment variables                                         | See below          |
 | `documentviewerFilter.documentviewerFilter.env.hdvRedisDb`            | Redis DB name                                                                              | `"0"`              |
-| `documentviewerFilter.documentviewerFilter.env.hdvRedisPassword`      | Redis passowrd ( **Need to set same value as `redis.auth.password`** )                     | `"redispass"`      |
+| `documentviewerFilter.documentviewerFilter.env.hdvRedisPassword`      | Redis passowrd ( **Need to set the same value as `redis.auth.password`** )                 | `"redispass"`      |
 | `documentviewerFilter.documentviewerFilter.env.hdvRedisPort`          | Redis port                                                                                 | `6379`             |
 | `documentviewerFilter.documentviewerFilter.env.hdvRedisRetryCount`    | Connection retry count with Redis                                                          | `20`               |
 | `documentviewerFilter.documentviewerFilter.env.hdvRedisRetryInterval` | Connection retry interval duration seconds                                                 | `3`                |
@@ -96,8 +96,8 @@ helm delete my-release
 | `documentviewerFilter.documentviewerFilter.securityContext`           | The DocumentViewer containers' Security Context                                            | `{}`               |
 | `documentviewerFilter.documentviewerFilter.imagePullSecrets`          | The DocumentViewer image pull secrets	                                                     | `[]`               |
 | `documentviewerFilter.documentviewerFilter.imagePullPolicy`           | The DocumentViewer image pull policy	                                                     | `IfNotPresent`     |
-| `documentviewerFilter.documentviewerFilter.resources.limits`          | Pod resource limits	                                                                     | `{}`               |
-| `documentviewerFilter.documentviewerFilter.resources.requests`        | Pod resource requests                                                                      | `{}`               |
+| `documentviewerFilter.documentviewerFilter.resources.limits`          | Pod resources limit	                                                                     | `{}`               |
+| `documentviewerFilter.documentviewerFilter.resources.requests`        | Pod resources request                                                                      | `{}`               |
 | `documentviewerFilter.service.port`                                   | Service port                                                                               | `8101`             |
 | `documentviewerFilter.service.type`                                   | Service type	                                                                             | `ClusterIP`        |
 | `documentviewerFilter.autoscaling.enabled`                            | Enable Horizontal POD autoscaling for the DocumentViewer                                   | `false`            |
@@ -113,9 +113,9 @@ helm delete my-release
 
 | Name                                         | Description                                           | Value              |
 | -------------------------------------------- | ----------------------------------------------------- | ------------------ |
-| `persistence.filterConf.storageClass`        | Persistent Volume storage class for configure files   | `""`               |
-| `persistence.filterConf.size`                | Persistent Volume size	for configure files            | `300Mi`            |
-| `persistence.filterConf.accessModes`         | Persistent Volume access modes	for configure files    | `["ReadWriteMany"]`|
+| `persistence.filterConf.storageClass`        | Persistent Volume storage class for configuration files   | `""`               |
+| `persistence.filterConf.size`                | Persistent Volume size	for configuration files            | `300Mi`            |
+| `persistence.filterConf.accessModes`         | Persistent Volume access modes	for configuration files    | `["ReadWriteMany"]`|
 | `persistence.filterDocsTemplate.storageClass`| Persistent Volume storage class for template files    | `""`               |
 | `persistence.filterDocsTemplate.size`        | Persistent Volume size for template files             | `300Mi`            |
 | `persistence.filterDocsTemplate.accessModes` | Persistent Volume access modes for template files     | `["ReadWriteMany"]`|
